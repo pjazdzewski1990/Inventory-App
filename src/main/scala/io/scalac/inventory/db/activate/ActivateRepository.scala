@@ -1,7 +1,8 @@
 package io.scalac.inventory.db.activate
 
-import io.scalac.inventory.db.{ReportRepository, ItemRepository, OfficeRepository}
-import io.scalac.inventory.db.activate.Domain._
+import io.scalac.inventory.db.IdWrappers._
+import io.scalac.inventory.db.activate.Domain.{Item, ItemEntity, OfficeEntity}
+import io.scalac.inventory.db.{Office, ReportRepository, ItemRepository, OfficeRepository}
 
 import io.scalac.inventory.db.activate.InventoryContext._
 import net.fwbrasil.activate.statement.StatementSelectValue
@@ -27,7 +28,7 @@ class ActivateRepository extends OfficeRepository with ItemRepository with Repor
     }
   }
 
-  override def readOffice(_id: OfficeId): Try[OfficeEntity] = genericFinder[OfficeEntity](_id.v)
+  override def readOffice(_id: OfficeId): Try[Office] = genericFinder[OfficeEntity](_id.v).map(_.canonical)
 
   override def deleteOffice(_id: OfficeId): Try[OfficeId] = Try {
     transactional {
@@ -42,23 +43,23 @@ class ActivateRepository extends OfficeRepository with ItemRepository with Repor
   ///ITEM
   override def createItem(name: String, code: Long, officeId: OfficeId): Try[ItemId] = Try {
     transactional {
-      val item = new ItemEntity(name, code, readOffice(officeId).get)
+      val item = new ItemEntity(name, code, genericFinder[OfficeEntity](officeId.v).get)
       item.id
     }
   }
 
-  override def readItem(_id: ItemId): Try[ItemEntity] = genericFinder[ItemEntity](_id.v)
+  override def readItem(_id: ItemId): Try[Item] = genericFinder[ItemEntity](_id.v).map(_.canonical)
 
-  override def updateItem(itemId: ItemId, officeId: OfficeId): Try[ItemEntity] = Try {
+  override def updateItem(itemId: ItemId, officeId: OfficeId): Try[Item] = Try {
     transactional {
-      val original = readItem(itemId)
-      val newOffice = readOffice(officeId)
+      val original = genericFinder[ItemEntity](itemId.v)
+      val newOffice = genericFinder[OfficeEntity](officeId.v)
       original.map(toUpdate => {
         toUpdate.inOffice = newOffice.get
         toUpdate
-      }).get
-    }
-  }
+      })
+    }.map(_.canonical)
+  }.flatten
 
   override def deleteItem(_id: ItemId): Try[ItemId] = Try {
     transactional {
@@ -71,9 +72,9 @@ class ActivateRepository extends OfficeRepository with ItemRepository with Repor
   }
 
   //REPORT
-  override def listAllItems(): Try[List[ItemEntity]] = Try {
+  override def listAllItems(): Try[List[Item]] = Try {
     transactional {
       all[ItemEntity]
-    }
+    }.map(_.canonical)
   }
 }
