@@ -1,6 +1,6 @@
 package io.scalac.inventory.db.activate
 
-import io.scalac.inventory.db.{Office, CanonicalForm}
+import io.scalac.inventory.db.{Item, Office, CanonicalForm}
 import net.fwbrasil.activate.entity.Entity
 
 object Domain {
@@ -9,7 +9,6 @@ object Domain {
     override def canonical: Office = Office(location, address)
   }
 
-  sealed case class Item(val name: String, val code: Long, var office: Office)
   class ItemEntity(val name: String, val code: Long, var inOffice: OfficeEntity) extends Entity with CanonicalForm[Item] {
     def codeMustBeUnique = unique(_.code)
 

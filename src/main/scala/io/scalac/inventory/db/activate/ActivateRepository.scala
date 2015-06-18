@@ -1,8 +1,8 @@
 package io.scalac.inventory.db.activate
 
 import io.scalac.inventory.db.IdWrappers._
-import io.scalac.inventory.db.activate.Domain.{Item, ItemEntity, OfficeEntity}
-import io.scalac.inventory.db.{Office, ReportRepository, ItemRepository, OfficeRepository}
+import io.scalac.inventory.db.activate.Domain.{ItemEntity, OfficeEntity}
+import io.scalac.inventory.db._
 
 import io.scalac.inventory.db.activate.InventoryContext._
 import net.fwbrasil.activate.statement.StatementSelectValue

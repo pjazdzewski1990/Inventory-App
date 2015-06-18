@@ -1,10 +1,8 @@
 package io.scalac.inventory.db.slick
 
 import io.scalac.inventory.db.IdWrappers.{OfficeId, ItemId}
-import io.scalac.inventory.db.activate.Domain.{ItemEntity, Item}
-import io.scalac.inventory.db.{Office, ReportRepository, ItemRepository, OfficeRepository}
+import io.scalac.inventory.db._
 
-import scala.slick.ast.JoinType
 import scala.slick.driver.H2Driver.simple._
 import scala.slick.jdbc.JdbcBackend.Database.dynamicSession
 
