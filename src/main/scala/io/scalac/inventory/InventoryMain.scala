@@ -1,18 +1,18 @@
 package io.scalac.inventory
 
+import io.scalac.inventory.db.activate.ActivateRepository
 import io.scalac.inventory.db.{ReportRepository, ItemRepository, OfficeRepository}
 import io.scalac.inventory.db.slick.{SlickRepository, InventoryContext}
+import scala.slick.driver.H2Driver.simple._
 
 object InventoryMain extends App {
-
-  import io.scalac.inventory.db.activate.ActivateRepository
 
   override def main(args: Array[String]) = {
     testRepo(new ActivateRepository(), "Activate!")
     println("--==--")
     println("--==--")
     println("--==--")
-    InventoryContext.db.withDynSession{
+    InventoryContext.db.withTransaction{implicit f: Session =>
       testRepo(new SlickRepository(), "Slick")
     }
   }

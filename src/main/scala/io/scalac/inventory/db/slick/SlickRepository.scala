@@ -4,11 +4,10 @@ import io.scalac.inventory.db.IdWrappers.{OfficeId, ItemId}
 import io.scalac.inventory.db._
 
 import scala.slick.driver.H2Driver.simple._
-import scala.slick.jdbc.JdbcBackend.Database.dynamicSession
 
 import scala.util.Try
 
-class SlickRepository extends OfficeRepository with ItemRepository with ReportRepository {
+class SlickRepository(implicit session: Session) extends OfficeRepository with ItemRepository with ReportRepository {
 
   SchemaMigration.migrate()
 
@@ -65,11 +64,6 @@ class SlickRepository extends OfficeRepository with ItemRepository with ReportRe
 
   //REPORT
   override def listAllItems(): Try[List[Item]] = Try {
-//    Domain.itemsQuery.list.map{
-//      case (_, n, c, o) =>
-//        val office = readOffice(OfficeId(o.toString)).get
-//        Item(n, c, office)
-//    }
     Domain.itemsQuery.join(Domain.officesQuery).on(_.inOffice === _.id).list.map {
       case ((_, name, code, _), (_, location, address)) =>
         Item(name, code, Office(location, address))
